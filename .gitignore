@@ -11,3 +11,19 @@ tmp
 *.swp
 
 db/*.db
+
+# Modern Python workbench: never commit downloaded public records or local state.
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.test-data/
+data/
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+test-results/
+playwright-report/

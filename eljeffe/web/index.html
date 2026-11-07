@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="EL JEFFE — a local public records workbench for wanted notices and OpenSanctions data.">
+  <title>EL JEFFE · Public records workbench</title>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to records</a>
+  <aside class="sidebar" aria-label="Workspace navigation">
+    <a class="brand" href="#records"><img src="/icon.svg" width="38" height="38" alt=""><span>EL JEFFE<small>PUBLIC RECORDS WORKBENCH</small></span></a>
+    <div class="workspace-label"><span class="status-dot"></span> LOCAL WORKSPACE</div>
+    <nav>
+      <button class="nav-item selected" data-view="records" aria-current="page"><span class="nav-icon">▦</span> Records <span class="nav-count" id="nav-count">0</span></button>
+      <button class="nav-item" data-view="sources"><span class="nav-icon">◉</span> Data sources</button>
+      <button class="nav-item" data-view="guide"><span class="nav-icon">▤</span> Workbench guide</button>
+    </nav>
+    <div class="sidebar-note"><span class="eyebrow">FOLLOW THE MONEY</span><p>Connected records.<br>Preserved provenance.</p><span class="mono">FtM · JSONL · LOCAL</span></div>
+    <div class="sidebar-footer"><span class="status-dot"></span><span>Runs on your machine<small id="version">EL JEFFE</small></span></div>
+  </aside>
+  <main id="main" tabindex="-1">
+    <header class="topbar"><div class="breadcrumb">WORKSPACE <span>/</span> <strong id="breadcrumb">RECORDS</strong></div><div class="topbar-right"><span class="local-pill"><span class="status-dot"></span> Local storage</span><button id="refresh-button" class="icon-button" title="Refresh workspace" aria-label="Refresh workspace">↻</button></div></header>
+    <div class="content">
+      <div id="notification" class="notification" role="status" aria-live="polite" hidden><span id="notification-text"></span><button id="dismiss-notification" class="icon-button" aria-label="Dismiss message">×</button></div>
+      <div id="job-status" class="job-status" role="status" aria-live="polite" hidden><span class="spinner"></span><div><strong id="job-title">Updating source</strong><p id="job-message">Starting…</p></div></div>
+      <section id="view-records" aria-labelledby="records-title">
+        <div class="page-heading"><div><div class="eyebrow">YOUR RESEARCH WORKSPACE</div><h1 id="records-title">Explore the records<span class="cyan">.</span></h1><p>Wanted notices, sanctions and connected entities. Every record has a source.</p></div><button class="button primary" id="export-button"><span aria-hidden="true">↓</span> Export FtM + provenance</button></div>
+        <div class="stats-grid" aria-label="Workspace overview">
+          <div class="stat-card"><span class="stat-label">CURRENT RECORDS</span><strong id="stat-active">0</strong><span class="stat-foot">Present in latest local snapshots</span></div>
+          <div class="stat-card"><span class="stat-label">WANTED NOTICES <i class="tiny-dot wanted"></i></span><strong id="stat-wanted">0</strong><span class="stat-foot">Source-classified wanted records</span></div>
+          <div class="stat-card"><span class="stat-label">SANCTIONS <i class="tiny-dot sanction"></i></span><strong id="stat-sanction">0</strong><span class="stat-foot">Entities and listing records</span></div>
+          <div class="stat-card"><span class="stat-label">CONNECTED SOURCES</span><strong id="stat-sources">0</strong><span class="stat-foot" id="stat-updated">No local snapshots yet</span></div>
+        </div>
+        <div class="demo-banner" id="demo-banner" hidden><span class="badge demo">DEMO DATA</span><span>This workspace contains clearly labeled fictional examples.</span><button class="text-button" id="hide-demo">View other sources</button></div>
+        <section class="records-panel" aria-label="Search records">
+          <form id="search-form" class="search-row" role="search"><label class="search-box"><span aria-hidden="true">⌕</span><span class="sr-only">Search records</span><input id="search" name="q" type="search" maxlength="300" placeholder="Search a name, alias, identifier or place…" autocomplete="off"></label><button class="button" type="submit">Search <span aria-hidden="true">↗</span></button></form>
+          <div class="filters">
+            <label>Source<select id="source-filter"><option value="">All sources</option></select></label>
+            <label>Record category<select id="kind-filter"><option value="">All categories</option><option value="wanted">Wanted</option><option value="sanction">Sanctions</option><option value="pep">Politically exposed</option><option value="missing">Missing person</option><option value="other">Other / relationship</option></select></label>
+            <label>FtM schema<select id="schema-filter"><option value="">All schemas</option></select></label>
+            <label class="checkbox-label"><input id="inactive-filter" type="checkbox"> Include historical records</label>
+            <button class="text-button" id="clear-filters" type="button">Reset filters</button>
+          </div>
+          <div class="export-note" id="historical-note" hidden>Historical records may be absent from the latest source snapshot. Clear “Include historical records” to export a current FtM snapshot.</div>
+          <div class="results-toolbar"><div><strong id="result-count">Loading records…</strong><span id="result-context">Latest local observations</span></div><div class="view-switch" role="group" aria-label="Record display"><button id="cards-button" class="active" aria-pressed="true" title="Card view" aria-label="Card view">▦</button><button id="table-button" aria-pressed="false" title="Table view" aria-label="Table view">☷</button></div></div>
+          <div id="records" class="record-grid" aria-live="polite"></div>
+          <div id="empty-state" class="empty-state" hidden><div class="empty-symbol">⌕</div><span class="eyebrow" id="empty-eyebrow">READY WHEN YOU ARE</span><h2 id="empty-title">Start with a source.</h2><p id="empty-description">Bring public records into your local workspace, then search, explore connections and export in FollowTheMoney format.</p><div class="empty-actions"><button class="button primary" id="empty-connect">Connect a data source <span aria-hidden="true">↗</span></button><button class="button" id="demo-button">Explore fictional demo</button><button class="button" id="empty-reset" hidden>Reset filters</button></div><span class="empty-note" id="empty-note">No account required. Your workspace stays on this machine.</span></div>
+          <div class="pagination" id="pagination" hidden><span id="page-label"></span><div><button class="button compact" id="previous-page">← Previous</button><button class="button compact" id="next-page">Next →</button></div></div>
+        </section>
+        <p class="records-footnote">Category counts may overlap. “Current” means present in the latest local snapshot; verify status with the source authority.</p>
+      </section>
+      <section id="view-sources" aria-labelledby="sources-title" hidden>
+        <div class="page-heading"><div><div class="eyebrow">TRACEABLE BY DESIGN</div><h1 id="sources-title">Data sources<span class="cyan">.</span></h1><p>Import public records with source attribution and snapshot history.</p></div><button class="button" id="source-demo-button">Load fictional demo</button></div>
+        <div class="source-tools">
+          <section class="surface"><div class="section-number">01 / CONNECT</div><h2>Sync a public source</h2><p>Download a source snapshot into this workspace.</p><form id="sync-form"><label>Provider<select id="sync-provider"><option value="opensanctions">OpenSanctions</option><option value="fbi">FBI Wanted API</option></select></label><label id="dataset-label">OpenSanctions dataset<select id="sync-dataset"></select></label><p id="dataset-description" class="help-text"></p><div class="source-advice">OpenSanctions publishes wanted notices, sanctions, PEPs and relationships. These categories have different meanings. Check each dataset’s attribution and licensing before reuse.</div><button class="button primary" id="sync-button" type="submit">↓ Sync source</button></form></section>
+          <section class="surface"><div class="section-number">02 / IMPORT</div><h2>Bring your FtM files</h2><p>Import a FollowTheMoney JSONL file from your computer.</p><form id="import-form"><label class="file-drop" for="import-file"><span class="file-glyph">⇧</span><strong>Choose a JSONL file</strong><span>One FtM entity per line · UTF-8 · up to 20 MiB</span><input id="import-file" type="file" accept=".json,.jsonl,.ndjson,application/json"></label><p id="import-file-label" class="help-text">No file selected</p><button class="button" id="import-button" type="submit" disabled>Import file</button></form></section>
+        </div>
+        <div class="section-heading"><h2>Workspace sources <span id="source-count" class="muted">0</span></h2><button class="text-button" id="manifest-button">Download source manifest ↓</button></div><div id="sources-list" class="sources-list"></div>
+        <section class="history-section"><h2>Snapshot history</h2><div id="history-list" class="history-list"><p class="muted">No completed imports yet.</p></div></section>
+      </section>
+      <section id="view-guide" aria-labelledby="guide-title" hidden>
+        <div class="page-heading"><div><div class="eyebrow">RESEARCH WITH CONTEXT</div><h1 id="guide-title">The workbench guide<span class="cyan">.</span></h1><p>A local workspace for exploring public records with their provenance intact.</p></div></div>
+        <div class="guide-grid"><section class="surface"><span class="section-number">01 / START</span><h2>Connect or import</h2><p>Sync the FBI Wanted API or an OpenSanctions dataset in Data sources. You can also import line-delimited FollowTheMoney JSON. Use the fictional demo to explore without downloading live data.</p><button class="button" data-go="sources">Open data sources ↗</button></section><section class="surface"><span class="section-number">02 / INVESTIGATE</span><h2>Follow the source</h2><p>Search names, aliases or identifiers, then open a record to inspect its properties, source links and declared relationships. Similar names do not establish identity. Related entities are source-declared references, not inferred matches.</p><button class="button" data-go="records">Explore records ↗</button></section><section class="surface"><span class="section-number">03 / TAKE IT WITH YOU</span><h2>Export with provenance</h2><p>Export the current search as a ZIP containing FollowTheMoney JSONL and a provenance manifest with a checksum. If sources share an entity ID, select one source before export. Historical records remain searchable but are excluded from snapshot exports.</p></section><section class="surface"><span class="section-number">04 / UNDERSTAND STATUS</span><h2>Different records. Different meanings.</h2><p>Wanted notices, missing-person notices, sanctions designations and politically exposed person records are separate categories. PEP status does not imply wrongdoing. “Current” describes local snapshot membership, not a legal determination.</p></section></div>
+        <section class="surface guide-note"><h2>Local by default</h2><p>The workbench runs on your machine. Syncing contacts the selected public data provider; downloading record files contacts supported official source hosts. Records are kept in your local workspace. This interface does not automatically refresh sources or send your searches to a third-party service.</p><p>For a large OpenSanctions collection, the CLI offers a more direct way to sync and export. Run <code>eljeffe --help</code> or <code>python -m eljeffe --help</code> in your terminal.</p></section>
+      </section>
+      <footer class="disclaimer"><span class="notice-icon" aria-hidden="true">i</span><p id="disclaimer-text">Public-source research records. A search result is not an identity match or proof of guilt. Verify current status with the publishing authority. PEP status does not imply wrongdoing.</p></footer>
+    </div>
+  </main>
+  <dialog id="detail-dialog" class="detail-dialog" aria-labelledby="detail-title"><div class="detail-topbar"><span class="eyebrow">RECORD DETAIL / FOLLOW THE MONEY</span><button id="close-detail" class="icon-button" aria-label="Close record details">×</button></div><div id="detail-content"></div></dialog>
+</body>
+</html>
