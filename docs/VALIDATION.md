@@ -22,8 +22,7 @@ library was installed for the checks below.
 
 ## Automated checks
 
-The latest completed unittest run at the time of this record passed **65 tests in
-4.771 seconds**:
+The final local unittest run passed **65 tests in 5.746 seconds**:
 
 - **36 ingestion/network tests:** source discovery, parsing, pagination, integrity,
   attachment handling and controlled failure cases.
@@ -42,6 +41,9 @@ Additional completed checks:
   schema/property errors**.
 - The portable Python `.pyz` build completed.
 - Demo loading and searching from the built `.pyz` completed successfully.
+- Both the portable `.pyz` and an installed wheel were launched from outside the
+  source checkout. Each served its bundled `/`, `/app.js` and `/styles.css`
+  assets, and `/api/stats` reported the five explicitly loaded demo records.
 - The bundled FollowTheMoney model was independently checked against its upstream
   Git blob hash.
 
@@ -256,10 +258,25 @@ America/New_York.
 
 ## Operating-system coverage
 
-Local execution above is verified on Linux. GitHub Actions is configured for
-Windows, Linux, macOS Intel and macOS Apple silicon, plus Chromium browser tests.
-The actual remote matrix results are recorded after the branch is published;
-configuration alone does not establish that those operating systems have run.
+In addition to the local Linux checks, every job passed in
+[GitHub Actions run 42405101079](https://github.com/CRYPTOJEFFE/fbi-most-wanted-eljeffe/actions/runs/42405101079),
+testing commit `df2808525610e6c067b0301c5ee49c991b5bed42`:
+
+| Runner | Result | Work exercised |
+|---|---|---|
+| Linux (`ubuntu-latest`) | Passed | 65 tests, portable package build/demo, installed CLI |
+| Windows (`windows-latest`) | Passed | 65 tests, portable package build/demo, installed CLI |
+| Intel Mac (`macos-15-intel`) | Passed | 65 tests, portable package build/demo, installed CLI |
+| Apple silicon Mac (`macos-latest`) | Passed | 65 tests, portable package build/demo, installed CLI |
+| Chromium on Linux | Passed | All nine browser workflow groups |
+
+The native OS jobs used Python 3.12 and uploaded portable `.pyz` artifacts.
+The initial matrix exposed a test that compared an already resolved attachment
+path with an unresolved temporary-directory alias. The corrected assertion
+resolves both existing paths before checking containment; it continues to reject
+files outside the destination. The successful run above includes that correction.
+Browser automation was executed on Linux; this does not claim separate GUI
+automation on every OS or on every Chromium-branded browser.
 
 ## Primary references
 
