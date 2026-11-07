@@ -421,7 +421,10 @@ class AttachmentTests(unittest.TestCase):
         result = download_attachments(self.entity, self.root, client=client)
         self.assertEqual(result[0]["status"], "downloaded")
         path = Path(result[0]["path"])
-        self.assertTrue(path.is_relative_to(self.root))
+        # The downloader returns resolved paths. TemporaryDirectory may use a
+        # symlink/junction or shortened path spelling on macOS and Windows.
+        # Compare existing physical paths so aliases pass and escapes still fail.
+        self.assertTrue(path.resolve(strict=True).is_relative_to(self.root.resolve(strict=True)))
         self.assertEqual(result[0]["sha256"], hashlib.sha256(path.read_bytes()).hexdigest())
         again = download_attachments(self.entity, self.root, client=client)
         self.assertEqual(again[0]["status"], "cached")

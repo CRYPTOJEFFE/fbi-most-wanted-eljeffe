@@ -266,7 +266,7 @@ Primary references:
 
 - [OpenSanctions bulk data](https://www.opensanctions.org/docs/bulk/)
 - [Downloads, checksums, updates and deletions](https://www.opensanctions.org/docs/bulk/updates/)
-- [Dataset metadata](https://www.opensanctions.org/docs/bulk/metadata/)
+- [Dataset metadata](https://www.opensanctions.org/docs/metadata/)
 - [Non-commercial data use](https://www.opensanctions.org/docs/commercial/exemption/)
 - [FollowTheMoney concepts](https://followthemoney.tech/docs/)
 - [Entity structure and timestamps](https://www.opensanctions.org/docs/entities/)
