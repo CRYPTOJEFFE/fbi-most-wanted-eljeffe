@@ -1,0 +1,62 @@
+name: Workbench tests
+
+on:
+  push:
+    branches: [master, 'feat/**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    name: Python / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-15-intel, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run deterministic integration tests
+        run: python -m unittest discover -s tests -v
+      - name: Build portable CLI and browser app
+        run: python scripts/build_zipapp.py
+      - name: Exercise packaged CLI
+        run: python dist/eljeffe.pyz --data-dir .test-data demo
+      - name: Exercise installed package
+        run: |
+          python -m pip install .
+          eljeffe --version
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eljeffe-portable-${{ matrix.os }}
+          path: dist/eljeffe.pyz
+          retention-days: 30
+
+  chromium:
+    name: Chromium GUI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright@1.62.1
+      - run: npx playwright install --with-deps chromium
+      - name: Run browser workflow tests
+        run: node tests/browser_smoke.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: chromium-test-results
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 14
